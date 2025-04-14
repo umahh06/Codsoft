@@ -1,0 +1,80 @@
+# Codsoft
+import java.util.*;
+
+public class QuizApp {
+
+    static class Question {
+        String question;
+        String[] options;
+        int correctOption; // 1-based index
+
+        Question(String question, String[] options, int correctOption) {
+            this.question = question;
+            this.options = options;
+            this.correctOption = correctOption;
+        }
+    }
+
+    static List<Question> questions = new ArrayList<>();
+    static int score = 0;
+    static List<Boolean> answersCorrect = new ArrayList<>();
+    static Scanner scanner = new Scanner(System.in);
+
+    public static void main(String[] args) {
+        loadQuestions();
+        for (int i = 0; i < questions.size(); i++) {
+            askQuestion(i);
+        }
+        showResult();
+    }
+
+    static void loadQuestions() {
+        questions.add(new Question("What is the capital of France?",
+                new String[]{"1. Berlin", "2. Paris", "3. Rome", "4. Madrid"}, 2));
+        questions.add(new Question("What is 5 + 3?",
+                new String[]{"1. 6", "2. 8", "3. 7", "4. 9"}, 2));
+        questions.add(new Question("Who developed Java?",
+                new String[]{"1. Microsoft", "2. Apple", "3. Sun Microsystems", "4. Google"}, 3));
+    }
+
+    static void askQuestion(int index) {
+        Question q = questions.get(index);
+        System.out.println("\nQuestion " + (index + 1) + ": " + q.question);
+        for (String option : q.options) {
+            System.out.println(option);
+        }
+
+        Timer timer = new Timer();
+        TimerTask task = new TimerTask() {
+            public void run() {
+                System.out.println("\nTime's up! Moving to next question.");
+                answersCorrect.add(false);
+                timer.cancel();
+            }
+        };
+
+        timer.schedule(task, 10000); // 10 seconds
+
+        System.out.print("Enter your answer (1-4): ");
+        int answer = -1;
+        if (scanner.hasNextInt()) {
+            answer = scanner.nextInt();
+            timer.cancel();
+            if (answer == q.correctOption) {
+                score++;
+                answersCorrect.add(true);
+            } else {
+                answersCorrect.add(false);
+            }
+        }
+    }
+
+    static void showResult() {
+        System.out.println("\n--- Quiz Result ---");
+        System.out.println("Score: " + score + "/" + questions.size());
+        for (int i = 0; i < questions.size(); i++) {
+            String result = answersCorrect.get(i) ? "Correct" : "Incorrect";
+            System.out.println("Question " + (i + 1) + ": " + result);
+        }
+    }
+}
